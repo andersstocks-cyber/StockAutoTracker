@@ -38,7 +38,7 @@ def _alert_channels_to_list(raw_value: str) -> List[str]:
         parsed = json.loads(raw_value)
         if isinstance(parsed, list):
             return [str(item) for item in parsed]
-    except json.JSONDecodeError:
+    except (TypeError, json.JSONDecodeError):
         pass
     return ["iphone", "sms"]
 
@@ -83,8 +83,7 @@ def save_trigger(rule: BaseModel) -> Dict[str, Any]:
         )
         trigger_id = cursor.lastrowid
 
-    trigger = get_trigger_by_id(trigger_id)
-    return trigger
+    return get_trigger_by_id(trigger_id)
 
 
 def get_trigger_by_id(trigger_id: int) -> Dict[str, Any]:
@@ -93,6 +92,7 @@ def get_trigger_by_id(trigger_id: int) -> Dict[str, Any]:
             "SELECT * FROM triggers WHERE id = ?",
             (trigger_id,),
         ).fetchone()
+
     if row is None:
         raise ValueError(f"Trigger with id={trigger_id} not found")
     return _trigger_row_to_dict(row)
@@ -106,42 +106,54 @@ def get_all_triggers() -> List[Dict[str, Any]]:
     return [_trigger_row_to_dict(row) for row in rows]
 
 
+def _payload_value(payload: Any, field_name: str) -> Any:
+    if isinstance(payload, dict):
+        return payload.get(field_name)
+    return getattr(payload, field_name, None)
+
+
 def evaluate_rule_matches(payload: Any) -> List[Dict[str, Any]]:
     matches: List[Dict[str, Any]] = []
+    payload_ticker = _payload_value(payload, "ticker")
+
     for rule in get_all_triggers():
         if not rule["enabled"]:
             continue
-        if rule["ticker"].upper() != payload.ticker.upper():
+        if payload_ticker is None:
+            continue
+        if rule["ticker"].upper() != str(payload_ticker).upper():
             continue
 
         value = None
-        if rule["trigger_type"] == "rsi":
-            value = payload.rsi
-        elif rule["trigger_type"] == "volume":
-            value = payload.volume
-        elif rule["trigger_type"] == "percent_move":
-            value = payload.percent_move
+        trigger_type = rule["trigger_type"]
+        if trigger_type == "rsi":
+            value = _payload_value(payload, "rsi")
+        elif trigger_type == "volume":
+            value = _payload_value(payload, "volume")
+        elif trigger_type == "percent_move":
+            value = _payload_value(payload, "percent_move")
 
         if value is None:
             continue
 
+        comparator = rule["comparator"]
         triggered = False
-        if rule["comparator"] == "gt":
+        if comparator == "gt":
             triggered = value > rule["threshold"]
-        elif rule["comparator"] == "lt":
+        elif comparator == "lt":
             triggered = value < rule["threshold"]
-        elif rule["comparator"] == "gte":
+        elif comparator == "gte":
             triggered = value >= rule["threshold"]
-        elif rule["comparator"] == "lte":
+        elif comparator == "lte":
             triggered = value <= rule["threshold"]
-        elif rule["comparator"] == "eq":
+        elif comparator == "eq":
             triggered = value == rule["threshold"]
 
         if triggered:
             matches.append(
                 {
                     "ticker": rule["ticker"],
-                    "trigger_type": rule["trigger_type"],
+                    "trigger_type": trigger_type,
                     "threshold": rule["threshold"],
                     "actual_value": value,
                     "channels": rule["alert_channels"],

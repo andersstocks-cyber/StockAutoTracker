@@ -43,39 +43,39 @@ class AlertRequest(BaseModel):
 
 
 @app.on_event("startup")
-def startup_event():
+def startup_event() -> None:
     init_db()
     scheduler_service.start()
 
 
 @app.on_event("shutdown")
-def shutdown_event():
+def shutdown_event() -> None:
     scheduler_service.stop()
 
 
 @app.get("/health")
-def health():
+def health() -> dict:
     return {"status": "ok", "service": "StockAutoTracker API"}
 
 
 @app.get("/api/triggers")
-def get_triggers():
+def get_triggers() -> dict:
     return {"rules": get_all_triggers()}
 
 
 @app.post("/api/triggers")
-def create_trigger(rule: TriggerRule):
+def create_trigger(rule: TriggerRule) -> dict:
     saved_rule = save_trigger(rule)
     return {"message": "Trigger rule created", "rule": saved_rule}
 
 
 @app.post("/api/check")
-def evaluate_trigger(payload: TriggerCheckRequest):
+def evaluate_trigger(payload: TriggerCheckRequest) -> dict:
     return {"matches": evaluate_rule_matches(payload)}
 
 
 @app.post("/api/alerts/test")
-def send_alert(payload: AlertRequest):
+def send_alert(payload: AlertRequest) -> dict:
     return {
         "message": "Alert dispatched",
         "ticker": payload.ticker,
@@ -89,7 +89,7 @@ def send_alert(payload: AlertRequest):
 
 
 @app.get("/api/system/status")
-def system_status():
+def system_status() -> dict:
     return {
         "scheduler_running": scheduler_service.is_running(),
         "interval_seconds": scheduler_service.interval_seconds,
