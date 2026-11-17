@@ -1,0 +1,140 @@
+:root {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #071421;
+  color: #edf6ff;
+  line-height: 1.5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(180deg, #08131d 0%, #0f1f2d 100%);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+.app-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+}
+
+header {
+  margin-bottom: 24px;
+}
+
+header h1 {
+  margin: 0 0 8px;
+  font-size: 2.4rem;
+}
+
+header p {
+  margin: 0;
+  color: #bfd3e8;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.panel {
+  background: rgba(12, 22, 32, 0.9);
+  border: 1px solid rgba(160, 200, 255, 0.15);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.panel.wide {
+  grid-column: 1 / -1;
+}
+
+.panel h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+  color: #dfeeff;
+}
+
+input,
+select {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid rgba(167, 196, 255, 0.25);
+  background: rgba(7, 19, 30, 0.85);
+  color: #edf6ff;
+  padding: 10px 12px;
+}
+
+button {
+  background: linear-gradient(180deg, #2c7df4 0%, #2356d8 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.channel-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.checkbox-label {
+  display: inline-flex;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0;
+}
+
+.rule-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.rule-list li {
+  background: rgba(19, 37, 53, 0.8);
+  border-radius: 10px;
+  padding: 12px;
+  border: 1px solid rgba(93, 145, 202, 0.16);
+}
+
+.simulator-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.matches {
+  margin-top: 18px;
+  display: grid;
+  gap: 12px;
+}
+
+.match-card {
+  background: rgba(18, 54, 39, 0.85);
+  border: 1px solid rgba(94, 205, 146, 0.2);
+  border-radius: 12px;
+  padding: 12px;
+}
